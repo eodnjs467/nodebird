@@ -22,6 +22,7 @@ const items = [
 ];
 const AppLayout = ({ children }) => {
     const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+    // const {isLoggedIn} = useSelector((state) => state.user); 이런식으로 구조분해할당으로 받와와도 되는데 취향차이
     const [current, setCurrent] = useState('/');
     const onClickMenu = e => {
         setCurrent(e.key);

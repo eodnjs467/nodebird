@@ -6,7 +6,6 @@ import FollowList from "../components/FollowList";
 const Profile = () => {
     const followerList = [{nickname: '원숭이'}, {nickname: '실버타운'}, {nickname: '큰 동그라미'}];
     const followingList = [{nickname: '원숭이'}, {nickname: '실버타운'}, {nickname: '큰 동그라미'}];
-    const [id, setId] = useState('');
 
     return (
         <>
