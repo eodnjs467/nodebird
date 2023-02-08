@@ -5,6 +5,7 @@ import {addPost} from "../reducers/post";
 
 const PostForm = () => {
     const {imagePaths} = useSelector(state => state.post);
+    const id = Number(useSelector(state => state.user.me?.id));
     const dispatch = useDispatch();
 
     const [text, setText] = useState('');
@@ -15,14 +16,16 @@ const PostForm = () => {
     }, []);
 
     const onSubmit = useCallback(() => {
-        dispatch(addPost);
-    }, []);
+        const newPost = {
+            id,
+            content: text,
+        }
+        dispatch(addPost(newPost));
+    }, [text]);
 
     const onClickImageUpload = useCallback(() => {
         imageInput.current.click();
     }, [imageInput.current]);
-
-
 
     return (
         <Form style={{margin: '10px 0 20px'}} encType={"multipart/form-data"} onFinish={onSubmit}>
