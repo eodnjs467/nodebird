@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import wrapper from "../store/configureStore";
 
 const NodeBird = ({Component}) =>{
-
     return(
         <>
             <Component />

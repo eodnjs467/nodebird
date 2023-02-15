@@ -21,7 +21,7 @@ const items = [
     {label: <Link href="/signup"><a>회원가입</a></Link>, key: '/signup'},
 ];
 const AppLayout = ({ children }) => {
-    const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+    const {me} = useSelector((state) => state.user);
     // const {isLoggedIn} = useSelector((state) => state.user); 이런식으로 구조분해할당으로 받와와도 되는데 취향차이
     const [current, setCurrent] = useState('/');
     const onClickMenu = e => {
@@ -36,7 +36,7 @@ const AppLayout = ({ children }) => {
             <Menu onClick={onClickMenu} gutter={10} selectedKeys={[current]} mode="horizontal" items={items} />
             <Row gutter={8}>
                 <Col xs={24} md={6}>
-                    {isLoggedIn ? <UserProfile /> : <LoginForm />}
+                    {me ? <UserProfile /> : <LoginForm />}
                 </Col>
                 <Col xs={24} md={6}>
                     {children}

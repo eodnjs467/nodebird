@@ -4,6 +4,8 @@ import AppLayout from "../components/AppLayout";
 import {Button, Checkbox, Form, Input} from "antd";
 import useInput from "../hooks/useInput";
 import styled from "styled-components";
+import {useDispatch, useSelector} from "react-redux";
+import {signUpRequestAction} from "../reducers/user";
 
 export const ErrorMessage = styled.div`
   color: red;
@@ -12,7 +14,9 @@ export const RegisterButtonWrapper = styled.div`
   margin-top: 10px;
 `;
 const Signup = () => {
-    const [id, onChangeId] = useInput('');
+    const dispatch = useDispatch();
+    const {signUpLoading} = useSelector(state => state.user);
+    const [email, onChangeEmail] = useInput('');
     const [password, onChangePassword] = useInput('');
     const [nickname, onChangeNickname] = useInput('');
 
@@ -33,8 +37,8 @@ const Signup = () => {
     const onSubmit = useCallback(()=> {
         if (password !== passwordCheck) return setPasswordError(true);
         if (!term) return setTermError(true);
-
-        console.log(id, nickname, password);
+        const signUpData = {email, password, nickname};
+        dispatch(signUpRequestAction(signUpData));
     }, [password, passwordCheck, term]);
     return (
         <AppLayout>
@@ -44,9 +48,9 @@ const Signup = () => {
             </Head>
             <Form onFinish={onSubmit}>
                 <div>
-                    <label htmlFor="user-id">아이디</label>
+                    <label htmlFor="user-email">아이디</label>
                     <br/>
-                    <Input name="user-id" value={id} required onChange={onChangeId}/>
+                    <Input name="user-email" value={email} type={email} required onChange={onChangeEmail}/>
                 </div>
                 <div>
                     <label htmlFor="user-nickname">닉네임</label>
@@ -69,7 +73,7 @@ const Signup = () => {
                     {termError && <ErrorMessage>약관에 동의하셔야 합니다.</ErrorMessage>}
                 </div>
                 <RegisterButtonWrapper>
-                    <Button type="primary" htmlType="submit">가입하기</Button>
+                    <Button type="primary" htmlType="submit" loading={signUpLoading}>가입하기</Button>
                 </RegisterButtonWrapper>
             </Form>
         </AppLayout>
