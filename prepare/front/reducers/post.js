@@ -33,17 +33,29 @@ export const initialState = {
   addCommentLoading: false,
   addCommentDone: false,
   addCommentError: null,
+  deletePostLoading: false,
+  deletePostDone: false,
+  deletePostError: null,
 };
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
 
+export const DELETE_POST_REQUEST = 'DELETE_POST_REQUEST';
+export const DELETE_POST_SUCCESS = 'DELETE_POST_SUCCESS';
+export const DELETE_POST_FAILURE = 'DELETE_POST_FAILURE';
+
 export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
 export const addPostRequest = (data) => ({
   type: ADD_POST_REQUEST,
+  data,
+});
+
+export const deletePostRequest = data => ({
+  type: DELETE_POST_REQUEST,
   data,
 });
 
@@ -62,10 +74,11 @@ const reducer = (state = initialState, action) => {
         addPostError: null,
       };
     case ADD_POST_SUCCESS:
+      console.log('success data: ', action);
       return {
         ...state,
         mainPosts: [{
-          id: state.mainPosts.length + 1,
+          id: action.data.postId,
           User: {
             id: action.data.userId,
             nickname: action.data.nickname,
@@ -111,6 +124,27 @@ const reducer = (state = initialState, action) => {
         ...state,
         addCommentLoading: false,
         addCommentError: action.error,
+      };
+    case DELETE_POST_REQUEST:
+      return {
+        ...state,
+        deletePostLoading: true,
+        deletePostDone: false,
+        deletePostError: null,
+      };
+    case DELETE_POST_SUCCESS:
+      console.log(action.data);
+      return {
+        ...state,
+        mainPosts: state.mainPosts.filter((post) => action.data.postId !== post.id),
+        deletePostLoading: false,
+        deletePostDone: true,
+      };
+    case DELETE_POST_FAILURE:
+      return {
+        ...state,
+        deletePostLoading: false,
+        deletePostError: action.error,
       };
 
     default:
