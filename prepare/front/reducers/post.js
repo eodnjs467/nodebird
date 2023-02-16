@@ -1,3 +1,7 @@
+import shortId from "shortid";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import produce from "immer";
+
 export const initialState = {
   mainPosts: [{
     id: 1,
@@ -38,6 +42,8 @@ export const initialState = {
   deletePostError: null,
 };
 
+
+
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
@@ -54,7 +60,7 @@ export const addPostRequest = (data) => ({
   data,
 });
 
-export const deletePostRequest = data => ({
+export const deletePostRequest = (data) => ({
   type: DELETE_POST_REQUEST,
   data,
 });
@@ -64,92 +70,72 @@ export const addCommentRequest = (data) => ({
   data,
 });
 
-const reducer = (state = initialState, action) => {
+const postFormData = (data) => ({
+  id: data.postId,
+  User: {
+    id: data.userId,
+    nickname: data.nickname,
+  },
+  content: data.content,
+  Images: [],
+  Comments: [],
+});
+
+const CommentFormData = (data) => ({
+  id: shortId.generate(),
+  User: { id: data.userId, nickname: data.nickname },
+  content: data.content,
+});
+const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
     case ADD_POST_REQUEST:
-      return {
-        ...state,
-        addPostLoading: true,
-        addPostDone: false,
-        addPostError: null,
-      };
+      draft.addPostLoading = true;
+      draft.addPostDone = false;
+      draft.addPostErro = null;
+      break;
     case ADD_POST_SUCCESS:
-      console.log('success data: ', action);
-      return {
-        ...state,
-        mainPosts: [{
-          id: action.data.postId,
-          User: {
-            id: action.data.userId,
-            nickname: action.data.nickname,
-          },
-          content: action.data.content,
-          Images: [],
-          Comments: [],
-        }, ...state.mainPosts],
-        addPostLoading: false,
-        addPostDone: true,
-      };
+      draft.mainPosts.unshift(postFormData(action.data));
+      draft.addPostLoading = false;
+      draft.addPostDone = true;
+      break;
     case ADD_POST_FAILURE:
-      return {
-        ...state,
-        addPostLoading: false,
-        addPostError: action.error,
-      };
+      draft.addPostLoading = false;
+      draft.addPostError = action.error;
+      break;
     case ADD_COMMENT_REQUEST:
-      return {
-        ...state,
-        addCommentLoading: true,
-        addCommentDone: false,
-        addCommentError: null,
-      };
+      draft.addCommentLoading = true;
+      draft.addCommentDone = false;
+      draft.addCommentError = null;
+      break;
     case ADD_COMMENT_SUCCESS:
-      return {
-        ...state,
-        mainPosts: state.mainPosts.map((post) => (
-          post.id === action.data.postId
-            ? {
-              ...post,
-              Comments: [{
-                User: { id: action.data.user.userId, nickname: action.data.user.nickname },
-                content: action.data.content },
-              ...post.Comments] }
-            : post
-        )),
-        addCommentLoading: false,
-        addCommentDone: true,
-      };
+      // eslint-disable-next-line no-case-declarations
+      const post = draft.mainPosts.find((v) => v.id === action.data.postId);
+      post.Comments.unshift(CommentFormData(action.data));
+      draft.addCommentLoading = false;
+      draft.addCommentDone = true;
+      break;
     case ADD_COMMENT_FAILURE:
-      return {
-        ...state,
-        addCommentLoading: false,
-        addCommentError: action.error,
-      };
+      draft.CommentLoading = false;
+      draft.addCommentError = action.error;
+      break;
     case DELETE_POST_REQUEST:
-      return {
-        ...state,
-        deletePostLoading: true,
-        deletePostDone: false,
-        deletePostError: null,
-      };
+      draft.deletePostLoading = true;
+      draft.deletePostDone = false;
+      draft.deletePostError = null;
+      break;
     case DELETE_POST_SUCCESS:
-      console.log(action.data);
-      return {
-        ...state,
-        mainPosts: state.mainPosts.filter((post) => action.data.postId !== post.id),
-        deletePostLoading: false,
-        deletePostDone: true,
-      };
+      draft.mainPosts = draft.mainPosts.filter((v) => action.data.postId !== v.id);
+      draft.deletePostLoading = false;
+      draft.deletePostDone = true;
+      break;
     case DELETE_POST_FAILURE:
-      return {
-        ...state,
-        deletePostLoading: false,
-        deletePostError: action.error,
-      };
+      draft.deletePostLoading = false;
+      draft.deletePostError = action.error;
+      break;
 
     default:
-      return state;
+      break;
   }
-};
+});
 
 export default reducer;

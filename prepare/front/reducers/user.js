@@ -1,3 +1,6 @@
+import produce from "immer";
+import shortId from "shortid";
+
 export const initialState = {
   logInLoading: false, // 로그인 시도
   logInDone: false,
@@ -19,8 +22,8 @@ const dummyUser = (data) => ({
   nickname: 'BigOne',
   id: 1,
   Posts: [], // 시퀄라이저에서 합쳐주기때문에 대문자
-  Followings: [],
-  Followers: [],
+  Followings: [{ nickname: 'SilverCenter' }, { nickname: 'Dho' }],
+  Followers: [{ nickname: 'SilverCenter' }, { nickname: 'Dho' }],
 });
 
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
@@ -62,97 +65,70 @@ export const signUpRequestAction = (data) => {
   };
 };
 
-const reducer = (state = initialState, action) => {
+const signUpFormData = (data) => ({
+  id: shortId.generate(),
+  email: data.email,
+  nickname: data.nickname,
+  password: data.password, // TODO: DB 연결시 지우기
+  Posts: [],
+  Followings: [],
+  Followers: [],
+});
+
+const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
     case LOG_IN_REQUEST:
-      return {
-        ...state,
-        logInLoading: true,
-        loginDone: false,
-        loginError: null,
-      };
+      draft.logInLoading = true;
+      draft.logInDone = false;
+      draft.loginError = null;
+      break;
     case LOG_IN_SUCCESS:
-      return {
-        ...state,
-        logInLoading: false,
-        loginDone: true,
-        me: dummyUser(action.data),
-      };
+      draft.logInLoading = false;
+      draft.logInDone = true;
+      draft.me = dummyUser(action.data);
+      break;
     case LOG_IN_FAILURE:
-      return {
-        ...state,
-        logInLoading: false,
-        logInError: action.error,
-      };
+      draft.logInLoading = false;
+      draft.loginError = action.error;
+      break;
     case LOG_OUT_REQUEST:
-      return {
-        ...state,
-        logOutLoading: true,
-        logOutDone: false,
-        logOutError: null,
-      };
+      draft.logOutLoading = true;
+      draft.logOutError = null;
+      draft.logOutDone = false;
+      break;
     case LOG_OUT_SUCCESS:
-      return {
-        ...state,
-        logOutLoading: false,
-        logOutDone: true,
-        me: null,
-      };
+      draft.logOutLoading = false;
+      draft.logOutDone = true;
+      draft.me = null;
+      break;
     case LOG_OUT_FAILURE:
-      return {
-        ...state,
-        logOutLoading: false,
-        logOutError: action.error,
-      };
+      draft.logOutLoading = false;
+      draft.logOutError = action.error;
+      break;
     case SIGN_UP_REQUEST:
-      return {
-        ...state,
-        signUpLoading: true,
-        signUpError: null,
-        signUpDone: false,
-      };
+      draft.signUpLoading = true;
+      draft.signUpError = null;
+      draft.signUpDone = false;
+      break;
     case SIGN_UP_SUCCESS:
-      return {
-        ...state,
-        signUpLoading: false,
-        signUpDone: true,
-        signUpData: {
-          ...state.signUpData,
-          id: dummyUser.id + 1, // TODO: 수정요망
-          email: action.data.email,
-          nickname: action.data.nickname,
-          password: action.data.password, // TODO: DB 연결시 지우기
-          Posts: [],
-          Followings: [],
-          Followers: [],
-        },
-      };
+      draft.signUpLoading = false;
+      draft.signUpDone = true;
+      draft.signUpData = signUpFormData(action.data);
+      break;
     case SIGN_UP_FAILURE:
-      return {
-        ...state,
-        signUpLoading: false,
-        signUpError: action.error,
-      };
+      draft.signUpLoading = false;
+      draft.signUpError = action.error;
+      break;
     case ADD_POST_TO_ME:
-      return {
-        ...state,
-        me: {
-          ...state.me,
-          Posts: [...state.me.Posts, { id: action.data.postId }],
-        },
-      };
+      draft.me.Posts.unshift({ id: action.data.postId });
+      break;
     case DELETE_POST_OF_ME:
-      return {
-        ...state,
-        me: {
-          ...state.me,
-          Posts: state.me.Posts.filter((v) => v.id !== action.data.postId),
-        },
-      };
+      draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data.postId);
+      break;
 
     default:
       return state;
   }
-};
+});
 
 export default reducer;
