@@ -24,7 +24,6 @@ function LoginForm() {
     }, [email, password]);
 
     return (
-        // <form onSubmit={}q
       <FormWrapper onFinish={onSubmitForm}>
         <div>
           <label htmlFor="user-email">아이디</label>
@@ -36,9 +35,6 @@ function LoginForm() {
           <br />
           <Input name="user-password" type="password" value={password} onChange={onChangePassword} required />
         </div>
-        {/* <div style={otherPick}> */}
-        {/*    ㅋㅋ이런식으로 인라인 스타일링 useMemo 쓰면 됨 ㅋㅋ */}
-        {/* </div> */}
         <ButtonWrapper>
           <Button type="primary" htmlType="submit" loading={logInLoading}>로그인</Button>
           <Link href="/signup"><a><Button>회원가입</Button></a></Link>

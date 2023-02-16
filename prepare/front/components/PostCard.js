@@ -7,14 +7,16 @@ import {
     RetweetOutlined,
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PostImage from "./PostImage";
 import CommentForm from './CommentForm';
 import PostCardContent from "./PostCardContent";
+import { deletePostRequest } from "../reducers/post";
 
 function PostCard({ post }) {
-    const email = useSelector((state) => state.user.me?.email); // 로그인하면 id, password 정보가 있음 그게 me에 객체로 담김
-    const postCreatedId = post.User.id;// post 정보를 프랍스로 넘겨받고 있으니까 ㅇㅇㅇ
+    const dispatch = useDispatch();
+    const email = useSelector((state) => state.user.me?.email);
+    const postCreatedId = post.User.id;
     const [liked, setLiked] = useState(false);
     const [commentFormOpened, setCommentFormOpened] = useState(false);
     console.log('email: ', email);
@@ -25,6 +27,10 @@ function PostCard({ post }) {
 
     const onToggleComment = useCallback(() => {
         setCommentFormOpened((prevState) => !prevState);
+    }, []);
+
+    const onDeletePost = useCallback(() => {
+        dispatch(deletePostRequest({ postId: post.id }));
     }, []);
 
     return (
@@ -46,7 +52,7 @@ function PostCard({ post }) {
                   {email === postCreatedId ? (
                       <>
                           <Button>수정</Button>
-                          <Button type="danger">삭제</Button>
+                          <Button onClick={onDeletePost} type="danger">삭제</Button>
                       </>
                             ) : (
                               <Button>신고</Button>
