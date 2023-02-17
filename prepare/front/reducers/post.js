@@ -1,6 +1,7 @@
 import shortId from "shortid";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import produce from "immer";
+import { faker } from '@faker-js/faker/locale/ko';
 
 export const initialState = {
   mainPosts: [{
@@ -42,7 +43,29 @@ export const initialState = {
   deletePostError: null,
 };
 
+faker.seed(123);
 
+initialState.mainPosts = initialState.mainPosts.concat(
+    Array(20).fill().map(() => ({
+      id: shortId.generate(),
+      User: {
+        id: shortId.generate(),
+        nickname: faker.name.middleName(),
+      },
+      content: faker.commerce.productDescription(),
+      Images: [
+        { src: faker.image.image() },
+        { src: faker.image.image() },
+      ],
+      Comments: [{
+        User: {
+          id: shortId.generate(),
+          nickname: faker.name.middleName(),
+        },
+        content: faker.music.songName(),
+      }],
+    })),
+);
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
@@ -83,7 +106,7 @@ const postFormData = (data) => ({
 
 const CommentFormData = (data) => ({
   id: shortId.generate(),
-  User: { id: data.userId, nickname: data.nickname },
+  User: { id: data.user.userId, nickname: data.user.nickname },
   content: data.content,
 });
 const reducer = (state = initialState, action) => produce(state, (draft) => {
