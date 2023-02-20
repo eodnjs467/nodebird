@@ -3,9 +3,18 @@ import { all, fork, put, takeLatest, delay } from 'redux-saga/effects';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import shortId from 'shortid';
 import {
-  ADD_COMMENT_SUCCESS, ADD_COMMENT_FAILURE, ADD_COMMENT_REQUEST,
-  ADD_POST_SUCCESS, ADD_POST_FAILURE, ADD_POST_REQUEST,
-  DELETE_POST_REQUEST, DELETE_POST_SUCCESS, DELETE_POST_FAILURE,
+  ADD_COMMENT_SUCCESS,
+  ADD_COMMENT_FAILURE,
+  ADD_COMMENT_REQUEST,
+  ADD_POST_SUCCESS,
+  ADD_POST_FAILURE,
+  ADD_POST_REQUEST,
+  DELETE_POST_REQUEST,
+  DELETE_POST_SUCCESS,
+  DELETE_POST_FAILURE,
+  POST_LOADING_REQUEST,
+  POST_LOADING_SUCCESS,
+  POST_LOADING_FAILURE,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, DELETE_POST_OF_ME } from "../reducers/user";
 
@@ -17,6 +26,23 @@ function postAPI(action) {
       return axios.delete(`/api/posts/${action.data.postId}`);
     default:
       return null;
+  }
+}
+
+function* loadPost(action) {
+  try {
+    console.log('loadPost Saga: ', action);
+    // const result = yield call(postAPI, action);
+    delay(1000);
+    yield put({
+      type: POST_LOADING_SUCCESS,
+      data: action.data,
+    });
+  } catch (err) {
+    yield put({
+      type: POST_LOADING_FAILURE,
+      data: err.response.error,
+    });
   }
 }
 
@@ -80,6 +106,9 @@ function* addComment(action) {
   }
 }
 
+function* watchLoadPost() {
+  yield takeLatest(POST_LOADING_REQUEST, loadPost);
+}
 function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
 }
@@ -92,6 +121,7 @@ function* watchDeletePost() {
 }
 export default function* postSaga() {
   yield all([
+    fork(watchLoadPost),
     fork(watchAddPost),
     fork(watchAddComment),
     fork(watchDeletePost),
