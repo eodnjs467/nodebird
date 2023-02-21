@@ -12,14 +12,14 @@ import PostImage from "./PostImage";
 import CommentForm from './CommentForm';
 import PostCardContent from "./PostCardContent";
 import { deletePostRequest } from "../reducers/post";
+import FollowButton from "./FollowButton";
 
 function PostCard({ post }) {
     const dispatch = useDispatch();
-    const email = useSelector((state) => state.user.me?.email);
+    const { me } = useSelector((state) => state.user);
     const postCreatedId = post.User.id;
     const [liked, setLiked] = useState(false);
     const [commentFormOpened, setCommentFormOpened] = useState(false);
-    console.log('email: ', email);
 
     const onToggleLike = useCallback(() => {
         setLiked((prevLike) => !prevLike);
@@ -49,7 +49,7 @@ function PostCard({ post }) {
               key="more"
               content={(
                 <Button.Group>
-                  {email === postCreatedId ? (
+                  {me?.email === postCreatedId ? (
                       <>
                           <Button>수정</Button>
                           <Button onClick={onDeletePost} type="danger">삭제</Button>
@@ -63,6 +63,7 @@ function PostCard({ post }) {
               <EllipsisOutlined />
             </Popover>,
                 ]}
+          extra={ me && <FollowButton post={post} />}
         >
           <Card.Meta
             avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
