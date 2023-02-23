@@ -1,8 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import Head from "next/head";
 import { Button, Checkbox, Form, Input } from "antd";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
+import Router from "next/router";
 import useInput from "../hooks/useInput";
 import AppLayout from "../components/AppLayout";
 import { signUpRequestAction } from "../reducers/user";
@@ -15,7 +16,20 @@ export const RegisterButtonWrapper = styled.div`
 `;
 function Signup() {
     const dispatch = useDispatch();
-    const { signUpLoading } = useSelector((state) => state.user);
+    const { signUpLoading, signUpDone, signUpError } = useSelector((state) => state.user);
+
+    useEffect(() => {
+        if (signUpDone) {
+            Router.push('/').then(() => alert('회원가입이 완료되었습니다.'));
+        }
+    }, [signUpDone]);
+
+    useEffect(() => {
+        if (signUpError) {
+            alert(signUpError);
+        }
+    }, [signUpError]);
+
     const [email, onChangeEmail] = useInput('');
     const [password, onChangePassword] = useInput('');
     const [nickname, onChangeNickname] = useInput('');
