@@ -23,7 +23,6 @@ export const initialState = {
 };
 
 const dummyUser = (data) => ({
-  // action.data.id & pw
   ...data,
   nickname: 'BigOne',
   id: 1,
@@ -91,7 +90,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOG_IN_SUCCESS:
       draft.logInLoading = false;
       draft.logInDone = true;
-      draft.me = dummyUser(action.data);
+      draft.me = action.data;
       break;
     case LOG_IN_FAILURE:
       draft.logInLoading = false;
