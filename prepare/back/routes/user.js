@@ -6,6 +6,36 @@ const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 
 const router = express.Router();
 
+router.get('/', async (req, res, next) => {
+    try {
+        if (req.user){
+            const fullUserWithoutPassword = await User.findOne({
+                where: {id: req.user.id},
+                attributes: {
+                    exclude: ['password'],
+                },
+                include: [{
+                    model: Post,
+                    attributes: ['id'],
+                }, {
+                    model: User,
+                    as: 'Followers',
+                    attributes: ['id'],
+                }, {
+                    model: User,
+                    as: 'Followings',
+                    attributes: ['id'],
+                }],
+            });
+            res.status(200).json(fullUserWithoutPassword);
+        }
+        res.status(200).json(null);
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
 router.post('/login', isNotLoggedIn, (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         //  err 이 있다는 건 비동기요청한 서버에러가 발생했다.
