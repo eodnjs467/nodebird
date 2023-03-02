@@ -1,7 +1,5 @@
 import axios from 'axios';
-import { all, fork, put, takeLatest, delay } from 'redux-saga/effects';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import shortId from 'shortid';
+import { call, all, fork, put, takeLatest, delay } from 'redux-saga/effects';
 import {
   ADD_COMMENT_SUCCESS,
   ADD_COMMENT_FAILURE,
@@ -18,25 +16,25 @@ import {
 } from '../reducers/post';
 import { ADD_POST_TO_ME, DELETE_POST_OF_ME } from "../reducers/user";
 
-function postAPI(action) {
-  switch (action.type) {
-    case ADD_POST_REQUEST:
-      return axios.post('/api/posts/addPost', action.data);
-    case DELETE_POST_REQUEST:
-      return axios.delete(`/api/posts/${action.data.postId}`);
-    default:
-      return null;
-  }
+function loadPostsAPI() {
+  return axios.get('/posts');
 }
 
-function* loadPost(action) {
+function addPostAPI(data) {
+  return axios.post('/post', data);
+}
+
+function addCommentAPI(data) {
+  return axios.post(`/post/${data.postId}/comment`, data);
+}
+
+function* loadPost() {
   try {
-    console.log('loadPost Saga: ', action);
-    // const result = yield call(postAPI, action);
-    delay(1000);
+    const result = yield call(loadPostsAPI);
+    console.log('loadPost log', result);
     yield put({
       type: POST_LOADING_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({
@@ -48,18 +46,15 @@ function* loadPost(action) {
 
 function* addPost(action) {
   try {
-    const postId = shortId.generate();
-    // const result = yield all(addPostAPI, action.data)
-    yield delay(1000);
-    console.log('action: ', action);
+    const result = yield call(addPostAPI, action.data);
     yield put({
       type: ADD_POST_SUCCESS,
-      // data: result.data,
-      data: { postId, ...action.data },
+      data: result.data,
     });
+
     yield put({
       type: ADD_POST_TO_ME,
-      data: { postId },
+      data: { postId: result.data.id },
     });
   } catch (err) {
     yield put({
@@ -92,11 +87,10 @@ function* deletePost(action) {
 
 function* addComment(action) {
   try {
-    // const result = yield call(addCommentAPI, action.data);
-    delay(1000);
+    const result = yield call(addCommentAPI, action.data);
     yield put({
       type: ADD_COMMENT_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({
