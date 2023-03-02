@@ -17,7 +17,7 @@ import FollowButton from "./FollowButton";
 function PostCard({ post }) {
     const dispatch = useDispatch();
     const { me } = useSelector((state) => state.user);
-    const postCreatedId = post.User.id;
+    const postCreatedId = post.UserId;
     const [liked, setLiked] = useState(false);
     const [commentFormOpened, setCommentFormOpened] = useState(false);
 
@@ -49,7 +49,7 @@ function PostCard({ post }) {
               key="more"
               content={(
                 <Button.Group>
-                  {me?.email === postCreatedId ? (
+                  {me?.id === postCreatedId ? (
                       <>
                           <Button>수정</Button>
                           <Button onClick={onDeletePost} type="danger">삭제</Button>
@@ -98,9 +98,9 @@ function PostCard({ post }) {
 PostCard.propTypes = {
     post: PropTypes.shape({
         id: PropTypes.number,
-        User: PropTypes.object,
+        UserId: PropTypes.number,
         content: PropTypes.string,
-        createdAt: PropTypes.object,
+        createdAt: PropTypes.string,
         Comments: PropTypes.arrayOf(PropTypes.object),
         Images: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
