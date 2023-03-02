@@ -1,9 +1,10 @@
-import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
-import { postLoadingRequest } from "../reducers/post";
+import { POST_LOADING_REQUEST } from "../reducers/post";
+import { LOAD_MY_INFO_REQUEST } from "../reducers/user";
 
 function Home() {
   const dispatch = useDispatch();
@@ -11,14 +12,17 @@ function Home() {
   const { mainPosts, hasMorePosts } = useSelector((state) => state.post);
 
   useEffect(() => {
-    dispatch(postLoadingRequest(10));
+    dispatch({ type: LOAD_MY_INFO_REQUEST });
+    dispatch({ type: POST_LOADING_REQUEST });
   }, []);
 
   useEffect(() => {
     function onScroll() {
+      // eslint-disable-next-line max-len
       if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 10) {
         if (hasMorePosts) {
-          dispatch(postLoadingRequest(10));
+          // dispatch(postLoadingRequest(10));
+          dispatch({ type: POST_LOADING_REQUEST });
         }
       }
     }

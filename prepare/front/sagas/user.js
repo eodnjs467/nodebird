@@ -6,10 +6,15 @@ import {
     LOG_OUT_FAILURE, LOG_OUT_REQUEST, LOG_OUT_SUCCESS,
     SIGN_UP_FAILURE, SIGN_UP_REQUEST, SIGN_UP_SUCCESS,
     UNFOLLOW_REQUEST, UNFOLLOW_SUCCESS, UNFOLLOW_FAILURE,
+    LOAD_MY_INFO_REQUEST, LOAD_MY_INFO_SUCCESS, LOAD_MY_INFO_FAILURE,
 } from "../reducers/user";
 
 function logInAPI(data) {
     return axios.post('/user/login', data);
+}
+
+function loadUserAPI(data) {
+    return axios.get('/user', data);
 }
 
 function logOutAPI() {
@@ -39,6 +44,21 @@ function* logIn(action) {
         yield put({
             type: LOG_IN_FAILURE,
             error: err.response.data,
+        });
+    }
+}
+
+function* loadUser(action) {
+    try {
+        const result = yield call(loadUserAPI, action.data);
+        yield put({
+            type: LOAD_MY_INFO_SUCCESS,
+            data: result.data,
+        });
+    } catch (err) {
+        yield put({
+            type: LOAD_MY_INFO_FAILURE,
+            data: err.response.data,
         });
     }
 }
@@ -109,6 +129,10 @@ function* unfollow(action) {
     }
 }
 
+function* watchLoadUser() {
+    yield takeLatest(LOAD_MY_INFO_REQUEST, loadUser);
+}
+
 function* watchLogIn() {
     yield takeLatest(LOG_IN_REQUEST, logIn); // type: 'LOG_IN_REQUEST' 과 이거에 필요한 data 가 action 이라는거에 있는데 그게 logIn()에 매개변수로 전달된다.
 }
@@ -129,6 +153,7 @@ function* watchUnfollow() {
 }
 export default function* userSaga() {
     yield all([
+        fork(watchLoadUser),
         fork(watchLogIn),
         fork(watchLogOut),
         fork(watchSignUP),

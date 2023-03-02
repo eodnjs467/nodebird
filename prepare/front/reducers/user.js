@@ -2,6 +2,9 @@ import produce from "immer";
 import shortId from "shortid";
 
 export const initialState = {
+  LoadMyInfoLoading: false, // 유저 정보 가져오기 시도
+  LoadMyInfoDone: false,
+  LoadMyInfoError: null,
   logInLoading: false, // 로그인 시도
   logInDone: false,
   logInError: null,
@@ -30,6 +33,10 @@ const dummyUser = (data) => ({
   Followings: [{ nickname: 'SilverCenter' }, { nickname: 'Dho' }],
   Followers: [{ nickname: 'SilverCenter' }, { nickname: 'Dho' }],
 });
+
+export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
+export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
+export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
 
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
@@ -157,6 +164,20 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case UNFOLLOW_FAILURE:
       draft.unfollowLoading = false;
       draft.unfollowError = action.error;
+      break;
+    case LOAD_MY_INFO_REQUEST:
+      draft.loadMyInfoLoading = true;
+      draft.loadMyInfoDone = false;
+      draft.loadMyInfoError = null;
+      break;
+    case LOAD_MY_INFO_SUCCESS:
+      draft.loadMyInfoLoading = false;
+      draft.loadMyInfoDone = true;
+      draft.me = action.data;
+      break;
+    case LOAD_MY_INFO_FAILURE:
+      draft.loadMyInfoLoading = false;
+      draft.loadMyInfoError = action.error;
       break;
 
     default:
