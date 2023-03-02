@@ -1,9 +1,6 @@
-import shortId from "shortid";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import produce from "immer";
-import { faker } from '@faker-js/faker/locale/ko';
+// eslint-disable-next-line import/no-extraneous-dependencies
 
-faker.seed(123);
 export const initialState = {
   mainPosts: [],
   imagePaths: [],
@@ -22,27 +19,6 @@ export const initialState = {
   deletePostError: null,
 };
 
-export const generateDummyPost = (number) => Array(number).fill().map(() => ({
-  id: shortId.generate(),
-  User: {
-    id: shortId.generate(),
-    nickname: faker.name.middleName(),
-  },
-  content: faker.commerce.productDescription(),
-  Images: [
-    { src: faker.image.image() },
-    { src: faker.image.image() },
-  ],
-  Comments: [{
-    User: {
-      id: shortId.generate(),
-      nickname: faker.name.middleName(),
-    },
-    content: faker.music.songName(),
-  }],
-}));
-
-// initialState.mainPosts = initialState.mainPosts.concat();
 export const POST_LOADING_REQUEST = 'POST_LOADING_REQUEST';
 export const POST_LOADING_SUCCESS = 'POST_LOADING_SUCCESS';
 export const POST_LOADING_FAILURE = 'POST_LOADING_FAILURE';
@@ -59,11 +35,6 @@ export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
 
-export const postLoadingRequest = (number) => ({
-  type: POST_LOADING_REQUEST,
-  data: generateDummyPost(number),
-});
-
 export const addPostRequest = (data) => ({
   type: ADD_POST_REQUEST,
   data,
@@ -79,22 +50,6 @@ export const addCommentRequest = (data) => ({
   data,
 });
 
-const postFormData = (data) => ({
-  id: data.postId,
-  User: {
-    id: data.userId,
-    nickname: data.nickname,
-  },
-  content: data.content,
-  Images: [],
-  Comments: [],
-});
-
-const CommentFormData = (data) => ({
-  id: shortId.generate(),
-  User: { id: data.user.userId, nickname: data.user.nickname },
-  content: data.content,
-});
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
     case POST_LOADING_REQUEST:
@@ -107,7 +62,6 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.loadPostLoading = false;
       draft.loadPostDone = true;
       draft.hasMorePosts = draft.mainPosts.length < 50;
-      console.log('mainPostsLength : ', draft.mainPosts.length);
       break;
     case POST_LOADING_FAILURE:
       draft.loadPostLoading = false;
@@ -119,7 +73,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.addPostError = null;
       break;
     case ADD_POST_SUCCESS:
-      draft.mainPosts.unshift(postFormData(action.data));
+      draft.mainPosts.unshift(action.data);
       draft.addPostLoading = false;
       draft.addPostDone = true;
       break;
@@ -134,8 +88,8 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       break;
     case ADD_COMMENT_SUCCESS:
       // eslint-disable-next-line no-case-declarations
-      const post = draft.mainPosts.find((v) => v.id === action.data.postId);
-      post.Comments.unshift(CommentFormData(action.data));
+      const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+      post.Comments.unshift(action.data);
       draft.addCommentLoading = false;
       draft.addCommentDone = true;
       break;
