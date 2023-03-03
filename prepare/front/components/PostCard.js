@@ -11,18 +11,28 @@ import { useDispatch, useSelector } from "react-redux";
 import PostImage from "./PostImage";
 import CommentForm from './CommentForm';
 import PostCardContent from "./PostCardContent";
-import { deletePostRequest } from "../reducers/post";
+import { deletePostRequest, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST } from "../reducers/post";
 import FollowButton from "./FollowButton";
 
 function PostCard({ post }) {
     const dispatch = useDispatch();
-    const { me } = useSelector((state) => state.user);
+    const id = useSelector((state) => state.user.me?.id);
+    const liked = post.Likers.find((v) => v.id === id);
     const postCreatedId = post.UserId;
-    const [liked, setLiked] = useState(false);
     const [commentFormOpened, setCommentFormOpened] = useState(false);
 
-    const onToggleLike = useCallback(() => {
-        setLiked((prevLike) => !prevLike);
+    const onLike = useCallback(() => {
+        dispatch({
+            type: LIKE_POST_REQUEST,
+            data: post.id,
+        });
+    }, []);
+
+    const onUnlike = useCallback(() => {
+        dispatch({
+            type: UNLIKE_POST_REQUEST,
+            data: post.id,
+        });
     }, []);
 
     const onToggleComment = useCallback(() => {
@@ -40,8 +50,8 @@ function PostCard({ post }) {
           actions={[
             <RetweetOutlined key="setting" />,
                     liked
-                        ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onToggleLike} />
-                        : <HeartOutlined key="edit" onClick={onToggleLike} />,
+                        ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnlike} />
+                        : <HeartOutlined key="edit" onClick={onLike} />,
                     commentFormOpened
                         ? <MessageTwoTone twoToneColor="blue" key="comment" onClick={onToggleComment} />
                         : <MessageOutlined key="ellipsis" onClick={onToggleComment} />,
@@ -49,7 +59,7 @@ function PostCard({ post }) {
               key="more"
               content={(
                 <Button.Group>
-                  {me?.id === postCreatedId ? (
+                  {id === postCreatedId ? (
                       <>
                           <Button>수정</Button>
                           <Button onClick={onDeletePost} type="danger">삭제</Button>
@@ -63,7 +73,7 @@ function PostCard({ post }) {
               <EllipsisOutlined />
             </Popover>,
                 ]}
-          extra={ me && <FollowButton post={post} />}
+          extra={ id && <FollowButton post={post} />}
         >
           <Card.Meta
             avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
@@ -101,8 +111,10 @@ PostCard.propTypes = {
         UserId: PropTypes.number,
         content: PropTypes.string,
         createdAt: PropTypes.string,
+        User: PropTypes.object,
         Comments: PropTypes.arrayOf(PropTypes.object),
         Images: PropTypes.arrayOf(PropTypes.object),
+        Likers: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
 };
 
