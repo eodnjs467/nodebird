@@ -77,16 +77,16 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 });
 
 router.post('/', isNotLoggedIn, async (req, res, next) => {
-    try{
+    try {
         const exUser = await User.findOne({
             where: {
                 email: req.body.email,
             }
         })
-        if (exUser){
+        if (exUser) {
             return res.status(403).send('이미 사용중인 아이디입니다.'); // 이게 사가에서 err.response.로 들어감
         }
-        const hashedPassword  = await bcrypt.hash(req.body.password, 12);
+        const hashedPassword = await bcrypt.hash(req.body.password, 12);
         await User.create({
             email: req.body.email,
             nickname: req.body.nickname,
@@ -94,13 +94,11 @@ router.post('/', isNotLoggedIn, async (req, res, next) => {
         });
         // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3060');
         res.status(201).send('OK');
-    }catch (error) {
+    } catch (error) {
         console.log(error);
         next(error);
-
     }
-
-})
+});
 
 router.post('/logout', isLoggedIn, async (req, res, next) => {
     await req.logout(err => {
@@ -109,6 +107,21 @@ router.post('/logout', isLoggedIn, async (req, res, next) => {
         }
         res.send('ok');
     })
+});
+
+router.patch('/nickname', isLoggedIn, async (req, res, next) => {
+    try {
+        console.log('req.body.nickname:', req.body.nickname)
+        await User.update({
+            nickname: req.body.nickname,
+        }, {
+            where: {id: req.user.id},
+        });
+        res.status(200).json({nickname: req.body.nickname});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
 });
 
 module.exports = router;
