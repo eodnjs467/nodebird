@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import PostImage from "./PostImage";
 import CommentForm from './CommentForm';
 import PostCardContent from "./PostCardContent";
-import { deletePostRequest, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST } from "../reducers/post";
+import {DELETE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST} from "../reducers/post";
 import FollowButton from "./FollowButton";
 
 function PostCard({ post }) {
@@ -40,7 +40,10 @@ function PostCard({ post }) {
     }, []);
 
     const onDeletePost = useCallback(() => {
-        dispatch(deletePostRequest({ postId: post.id }));
+        dispatch({
+            type: DELETE_POST_REQUEST,
+            data: post.id,
+        });
     }, []);
 
     return (
@@ -73,7 +76,7 @@ function PostCard({ post }) {
               <EllipsisOutlined />
             </Popover>,
                 ]}
-          extra={ id && <FollowButton post={post} />}
+          extra={id && <FollowButton post={post} />}
         >
           <Card.Meta
             avatar={<Avatar>{post.User.nickname[0]}</Avatar>}

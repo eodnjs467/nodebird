@@ -93,8 +93,19 @@ router.post(`/:postId/comment`, isLoggedIn, async (req, res, next) => {
     }
 });
 
-router.delete('/', isLoggedIn, async (req, res, next) => {
-    res.json({id: req.body.postId});
+router.delete('/:postId', isLoggedIn, async (req, res, next) => {
+    try{
+        await Post.destroy({
+            where: {
+                id: req.params.postId,
+                UserId: req.user.id,        //  본인 게시글인지 확인
+            },
+        });
+        res.json({PostId: parseInt(req.params.postId, 10)});
+    } catch (error){
+        console.log(error);
+        next(error);
+    }
 });
 
 module.exports = router;
