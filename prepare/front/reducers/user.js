@@ -1,5 +1,4 @@
 import produce from "immer";
-import shortId from "shortid";
 
 export const initialState = {
   LoadMyInfoLoading: false, // 유저 정보 가져오기 시도
@@ -14,6 +13,9 @@ export const initialState = {
   signUpLoading: false, // 회원가입 시도
   signUpDone: false,
   signUpError: null,
+  changeNicknameLoading: false, // 닉네임 변경 시도
+  changeNicknameDone: false,
+  changeNicknameError: null,
   followLoading: false,
   followDone: false,
   followError: null,
@@ -24,15 +26,6 @@ export const initialState = {
   signUpData: {},
   loginData: {},
 };
-
-const dummyUser = (data) => ({
-  ...data,
-  nickname: 'BigOne',
-  id: 1,
-  Posts: [], // 시퀄라이저에서 합쳐주기때문에 대문자
-  Followings: [{ nickname: 'SilverCenter' }, { nickname: 'Dho' }],
-  Followers: [{ nickname: 'SilverCenter' }, { nickname: 'Dho' }],
-});
 
 export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
 export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
@@ -45,6 +38,10 @@ export const LOG_IN_FAILURE = 'LOG_IN_FAILURE';
 export const LOG_OUT_REQUEST = 'LOG_OUT_REQUEST';
 export const LOG_OUT_SUCCESS = 'LOG_OUT_SUCCESS';
 export const LOG_OUT_FAILURE = 'LOG_OUT_FAILURE';
+
+export const CHANGE_NICKNAME_REQUEST = 'CHANGE_NICKNAME_REQUEST';
+export const CHANGE_NICKNAME_SUCCESS = 'CHANGE_NICKNAME_SUCCESS';
+export const CHANGE_NICKNAME_FAILURE = 'CHANGE_NICKNAME_FAILURE';
 
 export const SIGN_UP_REQUEST = 'SIGN_UP_REQUEST';
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
@@ -69,24 +66,12 @@ export const logoutRequestAction = () => ({
   type: LOG_OUT_REQUEST,
 });
 
-export const signUpRequestAction = (data) => {
-  console.log(data);
-  return {
+export const signUpRequestAction = (data) => ({
     type: SIGN_UP_REQUEST,
     data,
-  };
-};
-
-const signUpFormData = (data) => ({
-  id: shortId.generate(),
-  email: data.email,
-  nickname: data.nickname,
-  password: data.password, // TODO: DB 연결시 지우기
-  Posts: [],
-  Followings: [],
-  Followers: [],
 });
 
+// eslint-disable-next-line default-param-last,consistent-return
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
     case LOG_IN_REQUEST:
@@ -125,17 +110,30 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case SIGN_UP_SUCCESS:
       draft.signUpLoading = false;
       draft.signUpDone = true;
-      // draft.signUpData = signUpFormData(action.data);
       break;
     case SIGN_UP_FAILURE:
       draft.signUpLoading = false;
       draft.signUpError = action.error;
       break;
+    case CHANGE_NICKNAME_REQUEST:
+      draft.changeNicknameLoading = true;
+      draft.changeNicknameError = null;
+      draft.changeNicknameDone = false;
+      break;
+    case CHANGE_NICKNAME_SUCCESS:
+      draft.changeNicknameLoading = false;
+      draft.changeNicknameDone = true;
+      draft.me.nickname = action.data.nickname;
+      break;
+    case CHANGE_NICKNAME_FAILURE:
+      draft.changeNicknameLoading = false;
+      draft.changeNicknameError = action.error;
+      break;
     case ADD_POST_TO_ME:
       draft.me.Posts.unshift({ id: action.data.postId });
       break;
     case DELETE_POST_OF_ME:
-      draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data.postId);
+      draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data.PostId);
       break;
     case FOLLOW_REQUEST:
       draft.followLoading = true;

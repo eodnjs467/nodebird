@@ -1,12 +1,27 @@
 import axios from "axios";
 import { all, fork, put, delay, takeLatest, call } from 'redux-saga/effects';
 import {
-    FOLLOW_REQUEST, FOLLOW_SUCCESS, FOLLOW_FAILURE,
-    LOG_IN_FAILURE, LOG_IN_REQUEST, LOG_IN_SUCCESS,
-    LOG_OUT_FAILURE, LOG_OUT_REQUEST, LOG_OUT_SUCCESS,
-    SIGN_UP_FAILURE, SIGN_UP_REQUEST, SIGN_UP_SUCCESS,
-    UNFOLLOW_REQUEST, UNFOLLOW_SUCCESS, UNFOLLOW_FAILURE,
-    LOAD_MY_INFO_REQUEST, LOAD_MY_INFO_SUCCESS, LOAD_MY_INFO_FAILURE,
+    FOLLOW_REQUEST,
+    FOLLOW_SUCCESS,
+    FOLLOW_FAILURE,
+    LOG_IN_FAILURE,
+    LOG_IN_REQUEST,
+    LOG_IN_SUCCESS,
+    LOG_OUT_FAILURE,
+    LOG_OUT_REQUEST,
+    LOG_OUT_SUCCESS,
+    SIGN_UP_FAILURE,
+    SIGN_UP_REQUEST,
+    SIGN_UP_SUCCESS,
+    UNFOLLOW_REQUEST,
+    UNFOLLOW_SUCCESS,
+    UNFOLLOW_FAILURE,
+    LOAD_MY_INFO_REQUEST,
+    LOAD_MY_INFO_SUCCESS,
+    LOAD_MY_INFO_FAILURE,
+    CHANGE_NICKNAME_REQUEST,
+    CHANGE_NICKNAME_SUCCESS,
+    CHANGE_NICKNAME_FAILURE,
 } from "../reducers/user";
 
 function logInAPI(data) {
@@ -23,6 +38,10 @@ function logOutAPI() {
 
 function signUpAPI(data) {
     return axios.post('/user', data);
+}
+
+function changeNicknameAPI(data) {
+    return axios.patch('/user/nickname', data);
 }
 
 function followAPI(data) {
@@ -82,7 +101,6 @@ function* signUp(action) {
     try {
         const result = yield call(signUpAPI, action.data);
         console.log('result: ', result);
-        // yield delay(1000);
         yield put({
             type: SIGN_UP_SUCCESS,
             // data: action.data,
@@ -90,6 +108,21 @@ function* signUp(action) {
     } catch (err) {
         yield put({
             type: SIGN_UP_FAILURE,
+            err: err.response.data,
+        });
+    }
+}
+
+function* changeNickname(action) {
+    try {
+        const result = yield call(changeNicknameAPI, action.data);
+        yield put({
+            type: CHANGE_NICKNAME_SUCCESS,
+            data: result.data,
+        });
+    } catch (err) {
+        yield put({
+            type: CHANGE_NICKNAME_FAILURE,
             err: err.response.data,
         });
     }
@@ -145,9 +178,14 @@ function* watchSignUP() {
     yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
 
+function* watchChangeNickname() {
+    yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
+}
+
 function* watchFollow() {
     yield takeLatest(FOLLOW_REQUEST, follow);
 }
+
 function* watchUnfollow() {
     yield takeLatest(UNFOLLOW_REQUEST, unfollow);
 }
@@ -157,6 +195,7 @@ export default function* userSaga() {
         fork(watchLogIn),
         fork(watchLogOut),
         fork(watchSignUP),
+        fork(watchChangeNickname),
         fork(watchFollow),
         fork(watchUnfollow),
     ]);
