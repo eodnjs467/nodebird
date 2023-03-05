@@ -29,6 +29,10 @@ function addPostAPI(data) {
   return axios.post('/post', data);
 }
 
+function deletePostAPI(data) {
+  return axios.delete(`/post/${data}`);
+}
+
 function likePostAPI(data) {
   return axios.patch(`/post/${data}/like`);
 }
@@ -109,16 +113,14 @@ function* addPost(action) {
 
 function* deletePost(action) {
   try {
-    console.log('deletdPost: ', action);
-    // const result = yield call(postAPI, action);
-    delay(1000);
+    const result = yield call(deletePostAPI, action.data);
     yield put({
       type: DELETE_POST_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
     yield put({
       type: DELETE_POST_OF_ME,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({

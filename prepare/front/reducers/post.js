@@ -150,7 +150,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       draft.deletePostError = null;
       break;
     case DELETE_POST_SUCCESS:
-      draft.mainPosts = draft.mainPosts.filter((v) => action.data.postId !== v.id);
+      draft.mainPosts = draft.mainPosts.filter((v) => action.data.PostId !== v.id);
       draft.deletePostLoading = false;
       draft.deletePostDone = true;
       break;
