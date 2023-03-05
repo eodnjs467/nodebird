@@ -65,9 +65,11 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
                 }, {
                     model: User,
                     as: 'Followers',
+                    attributes: ['id'],
                 }, {
                     model: User,
                     as: 'Followings',
+                    attributes: ['id'],
                 }]
             });
             // 내가 만든 서비스 통과 후, 패스포트 로그인 통과해서 진짜 최종 로그인 성공이라 user 정보 넘겨줌.
@@ -118,6 +120,40 @@ router.patch('/nickname', isLoggedIn, async (req, res, next) => {
             where: {id: req.user.id},
         });
         res.status(200).json({nickname: req.body.nickname});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
+router.patch('/:userId/follow', isLoggedIn, async (req, res, next) => { // PATCH /user/1/follow
+    try{
+        const user = await User.findOne({
+            where: {id: req.params.userId},
+        });
+        if(!user) {
+            return res.status(403).send('존재하지 않는 사용자입니다.');
+        }
+        // res.status(200).send(' good~~');
+        await user.addFollowers(req.user.id);
+        // await user.addFollowings(req.params.id);
+        res.status(200).json({UserId: parseInt(req.params.userId, 10)});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
+router.delete('/:userId/follow', isLoggedIn, async (req, res, next) => {  // DELETE /user/1/follow
+    try{
+        const user = await User.findOne({
+            where: {id: req.params.userId},
+        });
+        if(!user) {
+            return res.status(403).send('존재하지 않는 사용자입니다.');
+        }
+        await user.removeFollowers(req.user.id);
+        res.status(200).json({UserId: parseInt(req.params.userId, 10)});
     } catch (error) {
         console.log(error);
         next(error);
