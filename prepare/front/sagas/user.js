@@ -22,6 +22,14 @@ import {
     CHANGE_NICKNAME_REQUEST,
     CHANGE_NICKNAME_SUCCESS,
     CHANGE_NICKNAME_FAILURE,
+    LOAD_FOLLOWINGS_REQUEST,
+    LOAD_FOLLOWERS_REQUEST,
+    LOAD_FOLLOWERS_SUCCESS,
+    LOAD_FOLLOWERS_FAILURE,
+    LOAD_FOLLOWINGS_SUCCESS,
+    LOAD_FOLLOWINGS_FAILURE,
+    FOLLOWER_REMOVE_SUCCESS,
+    FOLLOWER_REMOVE_FAILURE, FOLLOWER_REMOVE_REQUEST,
 } from "../reducers/user";
 
 function logInAPI(data) {
@@ -45,10 +53,22 @@ function changeNicknameAPI(data) {
 }
 
 function followAPI(data) {
-    return axios.post('/api/follow', data);
+    return axios.patch(`/user/${data}/follow`);
 }
 function unfollowAPI(data) {
-    return axios.post('/api/unfollow', data);
+    return axios.delete(`/user/${data}/follow`);
+}
+
+function followerRemoveAPI(data) {
+    return axios.delete(`/user/follower/${data}`);
+}
+
+function loadFollowingsAPI() {
+    return axios.get('/user/following');
+}
+
+function loadFollowersAPI() {
+    return axios.get('/user/follower');
 }
 
 function* logIn(action) {
@@ -131,13 +151,14 @@ function* changeNickname(action) {
 function* follow(action) {
     try {
         console.log('action saga : ', action.data);
-        // const result = yield call(followAPI, action);
-        delay(1000);
+        const result = yield call(followAPI, action.data);
+        console.log(result);
         yield put({
             type: FOLLOW_SUCCESS,
-            data: action.data,
+            data: result.data,
         });
     } catch (err) {
+        console.log(err);
         yield put({
             type: FOLLOW_FAILURE,
             err: err.response.data,
@@ -147,16 +168,63 @@ function* follow(action) {
 
 function* unfollow(action) {
     try {
-        console.log('action saga unfollow : ', action.data);
-        // const result = yield call(followAPI, action);
-        delay(1000);
+        const result = yield call(unfollowAPI, action.data);
         yield put({
             type: UNFOLLOW_SUCCESS,
-            data: action.data,
+            data: result.data,
         });
     } catch (err) {
+        console.log(err);
         yield put({
             type: UNFOLLOW_FAILURE,
+            err: err.response.data,
+        });
+    }
+}
+
+function* followerRemove(action) {
+    try {
+        const result = yield call(followerRemoveAPI, action.data);
+        yield put({
+            type: FOLLOWER_REMOVE_SUCCESS,
+            data: result.data,
+        });
+    } catch (err) {
+        console.log(err);
+        yield put({
+            type: FOLLOWER_REMOVE_FAILURE,
+            err: err.response.data,
+        });
+    }
+}
+
+function* loadFollowings() {
+    try {
+        const result = yield call(loadFollowingsAPI);
+        yield put({
+            type: LOAD_FOLLOWINGS_SUCCESS,
+            data: result.data,
+        });
+    } catch (err) {
+        console.log(err);
+        yield put({
+            type: LOAD_FOLLOWINGS_FAILURE,
+            err: err.response.data,
+        });
+    }
+}
+
+function* loadFollowers() {
+    try {
+        const result = yield call(loadFollowersAPI);
+        yield put({
+            type: LOAD_FOLLOWERS_SUCCESS,
+            data: result.data,
+        });
+    } catch (err) {
+        console.log(err);
+        yield put({
+            type: LOAD_FOLLOWERS_FAILURE,
             err: err.response.data,
         });
     }
@@ -189,6 +257,19 @@ function* watchFollow() {
 function* watchUnfollow() {
     yield takeLatest(UNFOLLOW_REQUEST, unfollow);
 }
+
+function* watchFollowerRemove() {
+    yield takeLatest(FOLLOWER_REMOVE_REQUEST, followerRemove);
+}
+
+function* watchLoadFollowings() {
+    yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollowings);
+}
+
+function* watchLoadFollowers() {
+    yield takeLatest(LOAD_FOLLOWERS_REQUEST, loadFollowers);
+}
+
 export default function* userSaga() {
     yield all([
         fork(watchLoadUser),
