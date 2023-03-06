@@ -1,5 +1,5 @@
 import axios from "axios";
-import { all, fork, put, delay, takeLatest, call } from 'redux-saga/effects';
+import { all, fork, put, takeLatest, call } from 'redux-saga/effects';
 import {
     FOLLOW_REQUEST,
     FOLLOW_SUCCESS,
@@ -279,5 +279,8 @@ export default function* userSaga() {
         fork(watchChangeNickname),
         fork(watchFollow),
         fork(watchUnfollow),
+        fork(watchFollowerRemove),
+        fork(watchLoadFollowings),
+        fork(watchLoadFollowers),
     ]);
 }
