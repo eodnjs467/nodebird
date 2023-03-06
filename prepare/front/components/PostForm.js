@@ -5,7 +5,6 @@ import { addPostRequest } from '../reducers/post';
 
 function PostForm() {
   const { imagePaths } = useSelector((state) => state.post);
-  const { me } = useSelector((state) => state.user);
   const { addPostLoading } = useSelector((state) => state.post);
   const dispatch = useDispatch();
 
@@ -18,8 +17,6 @@ function PostForm() {
 
   const onSubmit = useCallback(() => {
     const newPost = {
-      userId: me.email,
-      nickname: me.nickname,
       content: text,
     };
     dispatch(addPostRequest(newPost));
