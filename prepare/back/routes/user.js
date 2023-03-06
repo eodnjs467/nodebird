@@ -160,4 +160,57 @@ router.delete('/:userId/follow', isLoggedIn, async (req, res, next) => {  // DEL
     }
 });
 
+router.delete('/follower/:userId', async (req, res, next) => {  // DELETE /user/follower/1
+    try{
+        const user = await User.findOne({
+            where: {id: req.params.userId},
+        });
+        if(!user) {
+            return res.status(403).send('존재하지 않는 사용자입니다.');
+        }
+        await user.removeFollowings(req.user.id);
+        res.status(200).json({UserId: user.id});
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
+router.get('/follower', isLoggedIn, async (req, res, next) => {
+    try{
+        const user = await User.findOne({
+            where: {id: req.user.id},
+        });
+        if(!user) {
+            return res.status(403).send('존재하지 않는 사용자입니다.');
+        }
+        const followers = await user.getFollowers({
+            attributes:['id', 'nickname']
+        });
+        res.status(200).json(followers)
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
+router.get('/following', isLoggedIn, async (req, res, next) => {
+    try{
+        const user = await User.findOne({
+            where: {id: req.user.id},
+        });
+        if(!user) {
+            return res.status(403).send('존재하지 않는 사용자입니다.');
+        }
+        const followings = await user.getFollowings({
+            attributes:['id', 'nickname']
+        });
+        res.status(200).json(followings)
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
+
 module.exports = router;
