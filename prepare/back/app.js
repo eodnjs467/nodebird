@@ -11,6 +11,7 @@ const db = require('./models');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const passportConfig = require('./passport');
+const path = require("path");
 
 dotenv.config();
 const app = express();
@@ -25,6 +26,7 @@ app.use(cors({
     origin: true,
     credentials: true,
 }));
+app.use('/', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());        // 프론트에서 json 형식으로 보냈을 때 json 형식을 넣어주고
 app.use(express.urlencoded({extended: true}));      // form 데이터를 넣었을 때 urlencoded 방식으로 넣어줌 이두개가 프론트에서 받은 데이터를 req.body 에 넣어주는 역할을 해준다.
 app.use(session({
