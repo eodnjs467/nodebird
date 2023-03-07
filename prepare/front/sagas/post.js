@@ -98,6 +98,7 @@ function* addPost(action) {
       data: { postId: result.data.id },
     });
   } catch (err) {
+    console.log(err);
     yield put({
       type: ADD_POST_FAILURE,
       error: err.response.data,
