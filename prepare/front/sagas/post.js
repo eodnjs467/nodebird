@@ -8,6 +8,7 @@ import {
   LIKE_POST_REQUEST, LIKE_POST_SUCCESS, LIKE_POST_FAILURE,
   UNLIKE_POST_REQUEST, UNLIKE_POST_SUCCESS, UNLIKE_POST_FAILURE,
   UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS,
+  RETWEET_REQUEST, RETWEET_SUCCESS, RETWEET_FAILURE,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, DELETE_POST_OF_ME } from "../reducers/user";
 
@@ -38,6 +39,10 @@ function addCommentAPI(data) {
   return axios.post(`/post/${data.postId}/comment`, data);
 }
 
+function retweetAPI(data) {
+  return axios.post(`/post/${data}/retweet`, data);
+}
+
 function* likePost(action) {
   try {
     const result = yield call(likePostAPI, action.data);
@@ -49,7 +54,7 @@ function* likePost(action) {
     console.log(err);
     yield put({
       type: LIKE_POST_FAILURE,
-      data: err.response.error,
+      error: err.response.error,
     });
   }
 }
@@ -65,7 +70,7 @@ function* unlikePost(action) {
     console.log(err);
     yield put({
       type: UNLIKE_POST_FAILURE,
-      data: err.response.error,
+      error: err.response.error,
     });
   }
 }
@@ -80,7 +85,7 @@ function* loadPost() {
   } catch (err) {
     yield put({
       type: POST_LOADING_FAILURE,
-      data: err.response.error,
+      error: err.response.error,
     });
   }
 }
@@ -136,7 +141,7 @@ function* deletePost(action) {
   } catch (err) {
     yield put({
       type: DELETE_POST_FAILURE,
-      data: err.response.error,
+      error: err.response.error,
     });
   }
 }
@@ -151,10 +156,26 @@ function* addComment(action) {
   } catch (err) {
     yield put({
       type: ADD_COMMENT_FAILURE,
-      err: err.response.data,
+      error: err.response.data,
     });
   }
 }
+
+function* retweet(action) {
+  try {
+    const result = yield call(retweetAPI, action.data);
+    yield put({
+      type: RETWEET_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: RETWEET_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 function* watchLikePost() {
   yield takeLatest(LIKE_POST_REQUEST, likePost);
 }
@@ -176,6 +197,9 @@ function* watchAddComment() {
 function* watchDeletePost() {
   yield takeLatest(DELETE_POST_REQUEST, deletePost);
 }
+function* watchRetweet() {
+  yield takeLatest(RETWEET_REQUEST, retweet);
+}
 export default function* postSaga() {
   yield all([
     fork(watchLikePost),
@@ -185,5 +209,6 @@ export default function* postSaga() {
     fork(watchUploadImages),
     fork(watchAddComment),
     fork(watchDeletePost),
+    fork(watchRetweet),
   ]);
 }

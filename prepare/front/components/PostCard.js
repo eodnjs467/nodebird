@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import PostImage from "./PostImage";
 import CommentForm from './CommentForm';
 import PostCardContent from "./PostCardContent";
-import {DELETE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST} from "../reducers/post";
+import { DELETE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST } from "../reducers/post";
 import FollowButton from "./FollowButton";
 
 function PostCard({ post }) {
@@ -46,12 +46,22 @@ function PostCard({ post }) {
         });
     }, []);
 
+    const onRetweet = useCallback(() => {
+        if (!id) {
+            return alert('로그인이 필요합니다');
+        }
+        dispatch({
+            type: RETWEET_REQUEST,
+            data: post.id,
+        });
+    }, [id]);
+
     return (
       <div style={{ marginBottom: 10 }}>
         <Card
           cover={post.Images[0] && <PostImage images={post.Images} />}
           actions={[
-            <RetweetOutlined key="setting" />,
+            <RetweetOutlined key="setting" onClick={onRetweet} />,
                     liked
                         ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnlike} />
                         : <HeartOutlined key="edit" onClick={onLike} />,
@@ -63,26 +73,41 @@ function PostCard({ post }) {
               content={(
                 <Button.Group>
                   {id === postCreatedId ? (
-                      <>
-                          <Button>수정</Button>
-                          <Button onClick={onDeletePost} type="danger">삭제</Button>
-                      </>
-                            ) : (
-                              <Button>신고</Button>
-                            )}
+                    <>
+                      <Button>수정</Button>
+                      <Button onClick={onDeletePost} type="danger">삭제</Button>
+                    </>
+                                ) : (
+                                  <Button>신고</Button>
+                                )}
                 </Button.Group>
-                    )}
+                        )}
             >
               <EllipsisOutlined />
             </Popover>,
                 ]}
           extra={id && <FollowButton post={post} />}
+          title={post.RetweetId ? post.User.nickname : null}
         >
-          <Card.Meta
-            avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
-            title={post.User.nickname}
-            description={<PostCardContent postData={post.content} />}
-          />
+          {post.RetweetId && post.Retweet
+                    ? (
+                      <Card
+                        cover={post.Retweet.Images[0] && <PostImage images={post.Retweet.Images} />}
+                      >
+                        <Card.Meta
+                          avatar={<Avatar>{post.Retweet.User.nickname[0]}</Avatar>}
+                          title={post.Retweet.User.nickname}
+                          description={<PostCardContent postData={post.Retweet.content} />}
+                        />
+                      </Card>
+                    )
+                    : (
+                      <Card.Meta
+                        avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
+                        title={post.User.nickname}
+                        description={<PostCardContent postData={post.content} />}
+                      />
+                    )}
         </Card>
         {commentFormOpened && (
         <>
@@ -100,7 +125,7 @@ function PostCard({ post }) {
                   description={item.content}
                 />
               </List.Item>
-            )}
+                        )}
           />
         </>
             )}
@@ -118,6 +143,8 @@ PostCard.propTypes = {
         Comments: PropTypes.arrayOf(PropTypes.object),
         Images: PropTypes.arrayOf(PropTypes.object),
         Likers: PropTypes.arrayOf(PropTypes.object),
+        Retweet: PropTypes.object,
+        RetweetId: PropTypes.object,
     }).isRequired,
 };
 

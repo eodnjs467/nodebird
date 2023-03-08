@@ -9,7 +9,7 @@ import { LOAD_MY_INFO_REQUEST } from "../reducers/user";
 function Home() {
   const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePosts } = useSelector((state) => state.post);
+  const { mainPosts, hasMorePosts, retweetError } = useSelector((state) => state.post);
 
   useEffect(() => {
     dispatch({ type: LOAD_MY_INFO_REQUEST });
@@ -17,11 +17,16 @@ function Home() {
   }, []);
 
   useEffect(() => {
+    if (retweetError) {
+      alert(retweetError);
+    }
+  }, [retweetError]);
+
+  useEffect(() => {
     function onScroll() {
       // eslint-disable-next-line max-len
       if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 10) {
         if (hasMorePosts) {
-          // dispatch(postLoadingRequest(10));
           dispatch({ type: POST_LOADING_REQUEST });
         }
       }
