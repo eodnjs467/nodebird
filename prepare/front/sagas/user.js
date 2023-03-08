@@ -97,7 +97,7 @@ function* loadUser(action) {
     } catch (err) {
         yield put({
             type: LOAD_MY_INFO_FAILURE,
-            data: err.response.data,
+            error: err.response.data,
         });
     }
 }
@@ -128,7 +128,7 @@ function* signUp(action) {
     } catch (err) {
         yield put({
             type: SIGN_UP_FAILURE,
-            err: err.response.data,
+            error: err.response.data,
         });
     }
 }
@@ -161,7 +161,7 @@ function* follow(action) {
         console.log(err);
         yield put({
             type: FOLLOW_FAILURE,
-            err: err.response.data,
+            error: err.response.data,
         });
     }
 }
@@ -177,7 +177,7 @@ function* unfollow(action) {
         console.log(err);
         yield put({
             type: UNFOLLOW_FAILURE,
-            err: err.response.data,
+            error: err.response.data,
         });
     }
 }
@@ -193,7 +193,7 @@ function* followerRemove(action) {
         console.log(err);
         yield put({
             type: FOLLOWER_REMOVE_FAILURE,
-            err: err.response.data,
+            error: err.response.data,
         });
     }
 }
@@ -209,7 +209,7 @@ function* loadFollowings() {
         console.log(err);
         yield put({
             type: LOAD_FOLLOWINGS_FAILURE,
-            err: err.response.data,
+            error: err.response.data,
         });
     }
 }
@@ -225,7 +225,7 @@ function* loadFollowers() {
         console.log(err);
         yield put({
             type: LOAD_FOLLOWERS_FAILURE,
-            err: err.response.data,
+            error: err.response.data,
         });
     }
 }
