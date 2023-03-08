@@ -80,6 +80,73 @@ router.post('/images', isLoggedIn, upload.array('image'), (req, res, next) => {
     res.json(req.files.map((v) => v.filename));
 });
 
+router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
+    try{
+        const post = await Post.findOne({
+            where: {id: req.params.postId},
+            include: [{
+                model: Post,
+                as: 'Retweet',
+            }],
+        });
+        if(!post){
+            return res.status(403).send('존재하지 않는 게시글입니다.');
+        }
+        console.log('post.Retweet: ', post.Retweet);
+        if (post.UserId === req.user.id || post.Retweet && post.Retweet.UserId === req.user.id) {
+            return res.status(403).send('자신의 게시글을 리트윗 할 수 없습니다.');
+        }
+        const retweetTargetId = post.RetweetId || post.id;
+        const exPost = await Post.findOne({
+            where: {
+                UserId: req.user.id,
+                RetweetId: retweetTargetId,
+            },
+        });
+        if (exPost) {
+            return res.status(403).send('이미 리트윗 하셨습니다.')
+        }
+        const retweet = await Post.create({
+            UserId: req.user.id,
+            RetweetId: retweetTargetId,
+            content: 'retweet',
+        });
+        //위 retweet 에 정보를 추가해서 보내주기 위함
+        const retweetWithPrevPost = await Post.findOne({
+            where: {id: retweet.id},
+            include: [{
+                model: Post,
+                as: 'Retweet',
+                include: [{
+                    model: User,
+                    attributes: ['id', 'nickname'],
+                }, {
+                    model: Image,
+                }]
+            }, {
+                model: User,
+                attributes: ['id', 'nickname'],
+            }, {
+                model: Image,
+            }, {
+                model: Comment,
+                include: [{
+                    model: User,
+                    attributes: ['id', 'nickname'],
+                }]
+            }, {
+                model: User,
+                as: 'Likers',
+                attributes: ['id'],
+            }]
+        });
+        res.status(200).json(retweetWithPrevPost);
+    } catch (error){
+        console.log(error);
+        next(error);
+    }
+});
+
 router.patch('/:postId/like', isLoggedIn, async (req, res, next) => {
     try{
         const post = await Post.findOne({
