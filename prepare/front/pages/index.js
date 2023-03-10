@@ -1,20 +1,22 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { END } from "redux-saga";
+import axios from "axios";
 import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
 import { POST_LOADING_REQUEST } from "../reducers/post";
 import { LOAD_MY_INFO_REQUEST } from "../reducers/user";
+import wrapper from "../store/configureStore";
 
 function Home() {
   const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
   const { mainPosts, hasMorePosts, retweetError, loadPostLoading } = useSelector((state) => state.post);
 
-  useEffect(() => {
-    dispatch({ type: LOAD_MY_INFO_REQUEST });
-    dispatch({ type: POST_LOADING_REQUEST });
-  }, []);
+  // useEffect(() => {
+  //
+  // }, []);
 
   useEffect(() => {
     if (retweetError) {
@@ -48,5 +50,21 @@ function Home() {
     </AppLayout>
   );
 }
+
+// eslint-disable-next-line max-len
+export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ req, res, ...ets }) => {
+  const cookie = req ? req.headers.cookie : '';
+  if (req && cookie) {
+    axios.defaults.headers.Cookie = cookie;
+  }
+  store.dispatch({
+    type: LOAD_MY_INFO_REQUEST,
+  });
+  store.dispatch({
+    type: POST_LOADING_REQUEST,
+  });
+  store.dispatch(END);
+  await store.sagaTask.toPromise();
+});
 
 export default Home;
