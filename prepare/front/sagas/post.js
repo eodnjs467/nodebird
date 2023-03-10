@@ -12,8 +12,8 @@ import {
 } from '../reducers/post';
 import { ADD_POST_TO_ME, DELETE_POST_OF_ME } from "../reducers/user";
 
-function loadPostsAPI() {
-  return axios.get('/posts');
+function loadPostsAPI(lastId) {
+  return axios.get(`/posts?lastId=${lastId || 0}`);
 }
 
 function addPostAPI(data) {
@@ -75,9 +75,9 @@ function* unlikePost(action) {
   }
 }
 
-function* loadPost() {
+function* loadPost(action) {
   try {
-    const result = yield call(loadPostsAPI);
+    const result = yield call(loadPostsAPI, action.lastId);
     yield put({
       type: POST_LOADING_SUCCESS,
       data: result.data,
