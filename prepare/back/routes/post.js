@@ -92,7 +92,6 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
         if(!post){
             return res.status(403).send('존재하지 않는 게시글입니다.');
         }
-        console.log('post.Retweet: ', post.Retweet);
         if (post.UserId === req.user.id || post.Retweet && post.Retweet.UserId === req.user.id) {
             return res.status(403).send('자신의 게시글을 리트윗 할 수 없습니다.');
         }
@@ -180,7 +179,6 @@ router.delete('/:postId/like', isLoggedIn, async (req, res, next) => {
 });
 router.post(`/:postId/comment`, isLoggedIn, async (req, res, next) => {
     try {
-        console.log('back:  ', req.params.postId);
         const post = await Post.findOne({
             where: {id: req.params.postId},
         });
