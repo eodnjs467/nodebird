@@ -25,19 +25,21 @@ import {
     LOAD_FOLLOWINGS_REQUEST,
     LOAD_FOLLOWERS_REQUEST,
     LOAD_FOLLOWERS_SUCCESS,
-    LOAD_FOLLOWERS_FAILURE,
-    LOAD_FOLLOWINGS_SUCCESS,
-    LOAD_FOLLOWINGS_FAILURE,
-    FOLLOWER_REMOVE_SUCCESS,
-    FOLLOWER_REMOVE_FAILURE, FOLLOWER_REMOVE_REQUEST,
+    LOAD_FOLLOWERS_FAILURE, LOAD_FOLLOWINGS_SUCCESS, LOAD_FOLLOWINGS_FAILURE,
+    FOLLOWER_REMOVE_SUCCESS, FOLLOWER_REMOVE_FAILURE, FOLLOWER_REMOVE_REQUEST,
+    LOAD_USER_SUCCESS, LOAD_USER_FAILURE, LOAD_USER_REQUEST,
 } from "../reducers/user";
 
 function logInAPI(data) {
     return axios.post('/user/login', data);
 }
 
+function loadMyInfoAPI() {
+    return axios.get('/user');
+}
+
 function loadUserAPI(data) {
-    return axios.get('/user', data);
+    return axios.get(`/user/${data}`);
 }
 
 function logOutAPI() {
@@ -87,9 +89,9 @@ function* logIn(action) {
     }
 }
 
-function* loadUser(action) {
+function* loadMyInfo() {
     try {
-        const result = yield call(loadUserAPI, action.data);
+        const result = yield call(loadMyInfoAPI);
         yield put({
             type: LOAD_MY_INFO_SUCCESS,
             data: result.data,
@@ -97,6 +99,22 @@ function* loadUser(action) {
     } catch (err) {
         yield put({
             type: LOAD_MY_INFO_FAILURE,
+            error: err.response.data,
+        });
+    }
+}
+
+function* loadUser(action) {
+    try {
+        const result = yield call(loadUserAPI, action.data);
+        yield put({
+            type: LOAD_USER_SUCCESS,
+            data: result.data,
+        });
+    } catch (err) {
+        console.log(err);
+        yield put({
+            type: LOAD_USER_FAILURE,
             error: err.response.data,
         });
     }
@@ -230,8 +248,12 @@ function* loadFollowers() {
     }
 }
 
+function* watchLoadMyInfo() {
+    yield takeLatest(LOAD_MY_INFO_REQUEST, loadMyInfo);
+}
+
 function* watchLoadUser() {
-    yield takeLatest(LOAD_MY_INFO_REQUEST, loadUser);
+    yield takeLatest(LOAD_USER_REQUEST, loadUser);
 }
 
 function* watchLogIn() {
@@ -272,6 +294,7 @@ function* watchLoadFollowers() {
 
 export default function* userSaga() {
     yield all([
+        fork(watchLoadMyInfo),
         fork(watchLoadUser),
         fork(watchLogIn),
         fork(watchLogOut),
