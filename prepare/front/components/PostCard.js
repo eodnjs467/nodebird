@@ -144,7 +144,7 @@ PostCard.propTypes = {
         Images: PropTypes.arrayOf(PropTypes.object),
         Likers: PropTypes.arrayOf(PropTypes.object),
         Retweet: PropTypes.object,
-        RetweetId: PropTypes.object,
+        RetweetId: PropTypes.number,
     }).isRequired,
 };
 
