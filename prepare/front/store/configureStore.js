@@ -1,10 +1,10 @@
-import {createWrapper} from 'next-redux-wrapper';
-import reducer from '../reducers';
-import {applyMiddleware, compose, createStore} from "redux";
+import { createWrapper } from 'next-redux-wrapper';
+import { applyMiddleware, compose, createStore } from "redux";
 import process from "prop-types/prop-types";
 import {composeWithDevTools} from "redux-devtools-extension";
 // import thunkMiddleware from 'redux-thunk';
 import createSagaMiddleware from 'redux-saga';
+import reducer from '../reducers';
 import rootSaga from '../sagas';
 
 const loggerMiddleware = ({dispatch, getState}) => (next) => (action) => {
@@ -25,6 +25,6 @@ const configureStore = () => {
 
 const wrapper = createWrapper(configureStore, {
     debug: process.env.NODE_ENV === 'development',
-})
+});
 
 export default wrapper;

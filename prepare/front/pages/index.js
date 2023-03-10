@@ -9,7 +9,7 @@ import { LOAD_MY_INFO_REQUEST } from "../reducers/user";
 function Home() {
   const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePosts, retweetError } = useSelector((state) => state.post);
+  const { mainPosts, hasMorePosts, retweetError, loadPostLoading } = useSelector((state) => state.post);
 
   useEffect(() => {
     dispatch({ type: LOAD_MY_INFO_REQUEST });
@@ -26,8 +26,12 @@ function Home() {
     function onScroll() {
       // eslint-disable-next-line max-len
       if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 10) {
-        if (hasMorePosts) {
-          dispatch({ type: POST_LOADING_REQUEST });
+        if (hasMorePosts && !loadPostLoading) {
+          const lastId = mainPosts[mainPosts.length - 1]?.id;
+          dispatch({
+            type: POST_LOADING_REQUEST,
+            lastId,
+          });
         }
       }
     }
@@ -35,7 +39,7 @@ function Home() {
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
-  }, [hasMorePosts]);
+  }, [hasMorePosts, mainPosts, loadPostLoading]);
 
   return (
     <AppLayout>
