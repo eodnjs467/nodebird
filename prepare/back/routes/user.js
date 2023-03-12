@@ -36,6 +36,38 @@ router.get('/', async (req, res, next) => {
     }
 });
 
+router.get('/:userId', async (req, res, next) => {
+    try {
+            const fullUserWithoutPassword = await User.findOne({
+                where: {id: req.params.userId},
+                attributes: {
+                    exclude: ['password'],
+                },
+                include: [{
+                    model: Post,
+                    attributes: ['id'],
+                }, {
+                    model: User,
+                    as: 'Followers',
+                    attributes: ['id'],
+                }, {
+                    model: User,
+                    as: 'Followings',
+                    attributes: ['id'],
+                }],
+            });
+            if (fullUserWithoutPassword) {
+                res.status(200).json(fullUserWithoutPassword);
+            } else {
+                res.status(404).json('존재하지 않는 사용자입니다.')
+            }
+
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+});
+
 router.post('/login', isNotLoggedIn, (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         //  err 이 있다는 건 비동기요청한 서버에러가 발생했다.
@@ -113,7 +145,6 @@ router.post('/logout', isLoggedIn, async (req, res, next) => {
 
 router.patch('/nickname', isLoggedIn, async (req, res, next) => {
     try {
-        console.log('req.body.nickname:', req.body.nickname)
         await User.update({
             nickname: req.body.nickname,
         }, {
