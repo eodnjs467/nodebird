@@ -8,12 +8,15 @@ import {
   LIKE_POST_REQUEST, LIKE_POST_SUCCESS, LIKE_POST_FAILURE,
   UNLIKE_POST_REQUEST, UNLIKE_POST_SUCCESS, UNLIKE_POST_FAILURE,
   UPLOAD_IMAGES_REQUEST, UPLOAD_IMAGES_FAILURE, UPLOAD_IMAGES_SUCCESS,
-  RETWEET_REQUEST, RETWEET_SUCCESS, RETWEET_FAILURE,
+  RETWEET_REQUEST, RETWEET_SUCCESS, RETWEET_FAILURE, LOAD_POST_REQUEST, LOAD_POST_SUCCESS, LOAD_POST_FAILURE,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, DELETE_POST_OF_ME } from "../reducers/user";
 
 function loadPostsAPI(lastId) {
   return axios.get(`/posts?lastId=${lastId || 0}`);
+}
+function loadPostAPI(data) {
+  return axios.get(`/post/${data}`);
 }
 
 function addPostAPI(data) {
@@ -75,7 +78,7 @@ function* unlikePost(action) {
   }
 }
 
-function* loadPost(action) {
+function* loadPosts(action) {
   try {
     const result = yield call(loadPostsAPI, action.lastId);
     yield put({
@@ -85,6 +88,23 @@ function* loadPost(action) {
   } catch (err) {
     yield put({
       type: POST_LOADING_FAILURE,
+      error: err.response.error,
+    });
+  }
+}
+
+function* loadPost(action) {
+  try {
+    console.log('action.data', action.data);
+    const result = yield call(loadPostAPI, action.data);
+    yield put({
+      type: LOAD_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.log(err);
+    yield put({
+      type: LOAD_POST_FAILURE,
       error: err.response.error,
     });
   }
@@ -182,8 +202,11 @@ function* watchLikePost() {
 function* watchUnlikePost() {
   yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
 }
+function* watchLoadPosts() {
+  yield takeLatest(POST_LOADING_REQUEST, loadPosts);
+}
 function* watchLoadPost() {
-  yield takeLatest(POST_LOADING_REQUEST, loadPost);
+  yield takeLatest(LOAD_POST_REQUEST, loadPost);
 }
 function* watchAddPost() {
   yield takeLatest(ADD_POST_REQUEST, addPost);
@@ -204,6 +227,7 @@ export default function* postSaga() {
   yield all([
     fork(watchLikePost),
     fork(watchUnlikePost),
+    fork(watchLoadPosts),
     fork(watchLoadPost),
     fork(watchAddPost),
     fork(watchUploadImages),

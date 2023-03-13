@@ -11,9 +11,9 @@ export const initialState = {
   unLikePostLoading: false,
   unLikePostDone: false,
   unLikePostError: null,
-  loadPostLoading: false,
-  loadPostDone: false,
-  loadPostError: null,
+  loadPostsLoading: false,
+  loadPostsDone: false,
+  loadPostsError: null,
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
@@ -29,6 +29,10 @@ export const initialState = {
   retweetLoading: false,
   retweetDone: false,
   retweetError: null,
+  loadPostLoading: false,
+  loadPostDone: false,
+  loadPostError: null,
+  singlePost: null,
 };
 
 export const LIKE_POST_REQUEST = 'LIKE_POST_REQUEST';
@@ -63,6 +67,10 @@ export const RETWEET_REQUEST = 'RETWEET_REQUEST';
 export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
 export const RETWEET_FAILURE = 'RETWEET_FAILURE';
 
+export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
+export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
+export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
+
 export const addPostRequest = (data) => ({
   type: ADD_POST_REQUEST,
   data,
@@ -81,18 +89,18 @@ export const addCommentRequest = (data) => ({
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
     case POST_LOADING_REQUEST:
-      draft.loadPostLoading = true;
+      draft.s = true;
       draft.loadPostDone = false;
       draft.loadPostError = null;
       break;
     case POST_LOADING_SUCCESS:
       draft.mainPosts = draft.mainPosts.concat(action.data);
-      draft.loadPostLoading = false;
+      draft.loadPostsLoading = false;
       draft.loadPostDone = true;
       draft.hasMorePosts = action.data.length === 10;
       break;
     case POST_LOADING_FAILURE:
-      draft.loadPostLoading = false;
+      draft.loadPostsLoading = false;
       draft.loadPostError = action.error;
       break;
     case ADD_POST_REQUEST:
@@ -200,6 +208,20 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case RETWEET_FAILURE:
       draft.retweetLoading = false;
       draft.retweetError = action.error;
+      break;
+    case LOAD_POST_REQUEST:
+      draft.loadPostLoading = true;
+      draft.loadPostDone = false;
+      draft.loadPostError = null;
+      break;
+    case LOAD_POST_SUCCESS:
+      draft.singlePost = action.data;
+      draft.loadPostLoading = false;
+      draft.loadPostDone = true;
+      break;
+    case LOAD_POST_FAILURE:
+      draft.loadPostLoading = false;
+      draft.loadPostError = action.error;
       break;
 
     default:
