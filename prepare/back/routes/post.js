@@ -85,7 +85,6 @@ router.get('/:postId', async (req, res, next) => {
         const post = await Post.findOne({
             where: {id: req.params.postId},
         });
-        console.log('여기!', req.params.postId);
         if(!post){
             return res.status(403).send('존재하지 않는 게시글입니다.');
         }
