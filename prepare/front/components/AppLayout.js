@@ -1,27 +1,35 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import { Col, Input, Menu, Row } from "antd";
 import { useSelector } from "react-redux";
 import Head from "next/head";
 import styled from "styled-components";
 import Link from "next/link";
+import Router from "next/router";
 import LoginForm from "./LoginForm";
 import UserProfile from "./UserProfile";
+import useInput from "../hooks/useInput";
 
 export const InputSearch = styled(Input.Search)`
   vertical-align: middle;
 `;
-const onSearch = (value) => console.log(value);
 
-const items = [
-    { label: <Link href="/"><a>노드버드</a></Link>, key: '/' },
-    { label: <Link href="/profile"><a>프로필</a></Link>, key: '/profile' },
-    { label: <InputSearch placeholder="" onSearch={onSearch} enterButton />, key: 'search' },
-    { label: <Link href="/signup"><a>회원가입</a></Link>, key: '/signup' },
-];
 function AppLayout({ children }) {
     const { me } = useSelector((state) => state.user);
     // const {isLoggedIn} = useSelector((state) => state.user); 이런식으로 구조분해할당으로 받와와도 되는데 취향차이
+    const [searchInput, onChangeSearchInput] = useInput('');
+
+    const onSearch = useCallback(() => {
+        Router.push(`/hashtag/${searchInput}`);
+    }, [searchInput]);
+
+    const items = [
+        { label: <Link href="/"><a>노드버드</a></Link>, key: '/' },
+        { label: <Link href="/profile"><a>프로필</a></Link>, key: '/profile' },
+        { label: <InputSearch value={searchInput} onChange={onChangeSearchInput} placeholder="" onSearch={onSearch} enterButton />, key: 'search' },
+        { label: <Link href="/signup"><a>회원가입</a></Link>, key: '/signup' },
+    ];
+
     const [current, setCurrent] = useState('/');
     const onClickMenu = (e) => {
         setCurrent(e.key);
