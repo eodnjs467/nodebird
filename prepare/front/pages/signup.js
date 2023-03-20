@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import { Button, Checkbox, Form, Input } from "antd";
 import styled from "styled-components";
@@ -26,12 +26,14 @@ function Signup() {
 
     useEffect(() => {
         if (signUpDone) {
+            // eslint-disable-next-line no-alert
             Router.push('/').then(() => alert('회원가입이 완료되었습니다.'));
         }
     }, [signUpDone]);
 
     useEffect(() => {
         if (signUpError) {
+            // eslint-disable-next-line no-alert
             alert(signUpError);
         }
     }, [signUpError]);
@@ -54,6 +56,7 @@ function Signup() {
         setTermError(false);
     }, []);
 
+    // eslint-disable-next-line consistent-return
     const onSubmit = useCallback(() => {
         if (password !== passwordCheck) return setPasswordError(true);
         if (!term) return setTermError(true);

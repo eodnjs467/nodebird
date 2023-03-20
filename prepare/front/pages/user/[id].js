@@ -1,10 +1,10 @@
+import React, { useEffect } from "react";
 import Head from "next/head";
 import axios from "axios";
 import { END } from "redux-saga";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, Card } from "antd";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
 import { LOAD_MY_INFO_REQUEST, LOAD_USER_REQUEST } from "../../reducers/user";
 import wrapper from "../../store/configureStore";
 import AppLayout from "../../components/AppLayout";

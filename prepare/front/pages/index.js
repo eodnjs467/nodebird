@@ -14,12 +14,9 @@ function Home() {
   const { me } = useSelector((state) => state.user);
   const { mainPosts, hasMorePosts, retweetError, loadPostLoading } = useSelector((state) => state.post);
 
-  // useEffect(() => {
-  //
-  // }, []);
-
   useEffect(() => {
     if (retweetError) {
+      // eslint-disable-next-line no-alert
       alert(retweetError);
     }
   }, [retweetError]);
@@ -52,7 +49,7 @@ function Home() {
 }
 
 // eslint-disable-next-line max-len
-export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ req, res, ...ets }) => {
+export const getServerSideProps = wrapper.getServerSideProps((store) => async ({ req }) => {
   const cookie = req ? req.headers.cookie : '';
   if (req && cookie) {
     axios.defaults.headers.Cookie = cookie;

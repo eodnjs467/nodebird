@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import wrapper from "../store/configureStore";
 
+// eslint-disable-next-line react/prop-types
 function NodeBird({ Component }) {
     return (
       <Component />

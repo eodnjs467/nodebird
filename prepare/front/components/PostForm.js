@@ -1,7 +1,7 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Form, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import {ADD_POST_REQUEST, UPLOAD_IMAGES_REQUEST} from '../reducers/post';
+import { ADD_POST_REQUEST, UPLOAD_IMAGES_REQUEST } from '../reducers/post';
 
 function PostForm() {
     const { imagePaths, addPostLoading, addPostDone } = useSelector((state) => state.post);
@@ -20,8 +20,10 @@ function PostForm() {
         setText(e.target.value);
     }, []);
 
+    // eslint-disable-next-line consistent-return
     const onSubmit = useCallback(() => {
         if (!text || !text.trim()) {
+            // eslint-disable-next-line no-alert
             return alert('게시글을 작성하세요.');
         }
         const formData = new FormData();

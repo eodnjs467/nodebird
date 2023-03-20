@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from "react";
+import React, { useCallback, useEffect } from "react";
 import { Button, Form, Input } from "antd";
 import Link from "next/link";
 import styled from "styled-components";
@@ -20,6 +20,7 @@ function LoginForm() {
 
     useEffect(() => {
         if (loginError) {
+            // eslint-disable-next-line no-alert
             alert(loginError);
         }
     }, [loginError]);

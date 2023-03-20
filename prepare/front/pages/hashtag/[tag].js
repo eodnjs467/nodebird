@@ -1,10 +1,9 @@
 // hashtag/[tag]
-
+import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { END } from "redux-saga";
-import { useEffect } from "react";
 import wrapper from "../../store/configureStore";
 import { LOAD_MY_INFO_REQUEST } from "../../reducers/user";
 import { LOAD_HASHTAG_POSTS_REQUEST } from "../../reducers/post";

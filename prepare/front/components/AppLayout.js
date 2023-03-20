@@ -14,6 +14,7 @@ export const InputSearch = styled(Input.Search)`
   vertical-align: middle;
 `;
 
+// eslint-disable-next-line react/prop-types
 function AppLayout({ children }) {
     const { me } = useSelector((state) => state.user);
     // const {isLoggedIn} = useSelector((state) => state.user); 이런식으로 구조분해할당으로 받와와도 되는데 취향차이

@@ -49,8 +49,10 @@ function PostCard({ post }) {
         });
     }, []);
 
+    // eslint-disable-next-line consistent-return
     const onRetweet = useCallback(() => {
         if (!id) {
+            // eslint-disable-next-line no-alert
             return alert('로그인이 필요합니다');
         }
         dispatch({

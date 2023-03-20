@@ -10,7 +10,7 @@ function CommentForm({ postId }) {
     const { addCommentLoading, me } = useSelector((state) => state.user);
     const [commentText, onChangeCommentText] = useInput('');
     const onSubmitComment = useCallback(() => {
-        const data = { postId, content: commentText, user: { userId: me.id, nickname: me.nickname }};
+        const data = { postId, content: commentText, user: { userId: me.id, nickname: me.nickname } };
         dispatch(addCommentRequest(data));
     }, [commentText]);
     return (

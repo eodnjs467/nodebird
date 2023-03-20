@@ -66,11 +66,11 @@ function followerRemoveAPI(data) {
 }
 
 function loadFollowingsAPI() {
-    return axios.get('/user/following');
+    return axios.get('/user/followings');
 }
 
 function loadFollowersAPI() {
-    return axios.get('/user/follower');
+    return axios.get('/user/followers');
 }
 
 function* logIn(action) {
@@ -97,6 +97,7 @@ function* loadMyInfo() {
             data: result.data,
         });
     } catch (err) {
+        console.log(err);
         yield put({
             type: LOAD_MY_INFO_FAILURE,
             error: err.response.data,
